@@ -22,5 +22,5 @@ export const HERO_HOME = groq`
       ${LINK_INTERNAL}
     },
   },      
-  title
+  "title": title[_key == $language][0].value
 `;

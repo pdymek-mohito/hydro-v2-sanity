@@ -229,4 +229,10 @@ export const countries: Localizations = {
     country: 'XK',
     currency: 'EUR',
   },
+  '/pl-pl': {
+    label: 'Polska (PLN zł)',
+    language: 'PL',
+    country: 'PL',
+    currency: 'PLN',
+  },
 };

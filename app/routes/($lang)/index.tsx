@@ -3,6 +3,7 @@ import {Suspense} from 'react';
 import {Await, useLoaderData} from '@remix-run/react';
 import {ProductSwimlane, FeaturedCollections, Hero} from '~/components';
 import {MEDIA_FRAGMENT, PRODUCT_CARD_FRAGMENT} from '~/data/fragments';
+import { HOME_PAGE } from '~/fragments/sanity/pages/home';
 import {getHeroPlaceholder} from '~/lib/placeholders';
 import type {
   CollectionConnection,
@@ -10,6 +11,9 @@ import type {
   ProductConnection,
 } from '@shopify/hydrogen/storefront-api-types';
 import {AnalyticsPageType} from '@shopify/hydrogen';
+import groq from 'groq';
+import { sanityClient } from '~/clients/sanityClient';
+import { HomeHero } from '~/components/HomeHero';
 
 interface HomeSeoData {
   shop: {
@@ -30,7 +34,11 @@ export interface CollectionHero {
   top?: boolean;
 }
 
-export async function loader({params, context}: LoaderArgs) {
+export interface HomeHero {
+  title: string;
+}
+
+export async function loader({request, params, context}: LoaderArgs) {
   const {language, country} = context.storefront.i18n;
 
   if (
@@ -49,8 +57,15 @@ export async function loader({params, context}: LoaderArgs) {
     variables: {handle: 'freestyle'},
   });
 
+
+  const sanityHome = await sanityClient.fetch(groq`
+    *[_type == 'home'][0]{
+      ${HOME_PAGE}
+    }`, {language: language.toLowerCase()});
+
   return defer({
     shop,
+    sanityHome,
     primaryHero: hero,
     // These different queries are separated to illustrate how 3rd party content
     // fetching can be optimized for both above and below the fold.
@@ -103,7 +118,7 @@ export async function loader({params, context}: LoaderArgs) {
 
 export default function Homepage() {
   const {
-    primaryHero,
+    sanityHome,
     secondaryHero,
     tertiaryHero,
     featuredCollections,
@@ -122,9 +137,7 @@ export default function Homepage() {
 
   return (
     <>
-      {primaryHero && (
-        <Hero {...primaryHero} height="full" top loading="eager" />
-      )}
+      <HomeHero hero={sanityHome?.hero} />
 
       {featuredProducts && (
         <Suspense>

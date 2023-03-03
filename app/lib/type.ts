@@ -32,7 +32,8 @@ export type CartActions = keyof typeof CartAction;
 
 
 export type SanityHeroHome = {
-  content?: SanityImageWithProductHotspots | SanityProductWithVariant;
+  // content?: SanityImageWithProductHotspots | SanityProductWithVariant;
+  content?: SanityImageWithProductHotspots;
   link?: SanityLink;
   title?: string;
 };
